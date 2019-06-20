@@ -1,11 +1,12 @@
 *.o
+*.pyc
 sources/obj/
 sources/lib/jf_vendors/include/
 sources/lib/jf_vendors/lib/
 sources/vns_prm_pop
 sources/results/
 sources/output.log
-visualization/utils/__pycache__/
+visualization/utils/__pycache__
 sources/lib/rapid-2.01/libRAPID.a
 sources/lib/rapid-2.01/sample_client
 
