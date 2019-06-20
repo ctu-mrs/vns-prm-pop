@@ -1,0 +1,6 @@
+[submodule "sources/lib/jf_vendors/crl"]
+	path = sources/lib/jf_vendors/crl
+	url = https://github.com/comrob/crl
+[submodule "sources/lib/flann"]
+	path = sources/lib/flann
+	url = git@github.com:ctu-mrs/flann.git

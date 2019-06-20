@@ -1,0 +1,13 @@
+
+sources/obj/
+sources/lib/jf_vendors/include/
+sources/lib/jf_vendors/lib/
+sources/vns_prm_pop
+sources/results/
+sources/output.log
+visualization/utils/__pycache__/
+
+.cproject
+.project
+.pydevproject
+.settings/
