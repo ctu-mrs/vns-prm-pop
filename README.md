@@ -35,8 +35,8 @@ The VNS-PRM* can be compiled using the above dependencies by running **make** in
 
 ### Running VNS-PRM*
 
-After compilation, the VNS-SOP can be run using **sop\_vns** program and the ILP solver for SOP can be run using **sop\_ilp** program.
-The default configuration of programs is stored in **sop.cfg** file. 
+After compilation, the VNS-PRM can be run using **vns\_prm\_pop** program.
+The default configuration of programs is stored in **vns_prm_pop.cfg** file. 
 The most important configuration parameters are:
 - _problem_ - specifies location of sop dataset instance file
 - _gui_ - switch between "cairo" gui, "none" gui and "cairo-nowin" with background creation of gui images (gui is only shown for pure SOP and OPN instances, the DOP instances have no gui in runtime, however, can be visualized using the show_solution.py script)
@@ -44,6 +44,7 @@ The most important configuration parameters are:
 - _planning-state_ - switch between "2d", "dubins2d" or "3d" planning states
 - _map-type_ - switch between "MAP_POINTS_CITY_POINTS" for potholes and dense scenario, and "MAP_FILE" for building scenario
 - _collision-distance-check_ - distance in which check distance, aproximately minimal width among obstacles
+- _maximal-calculation-time-sec_ - the maximal calculation time in seconds, default is 600 as set in vns_prm_pop.cfg file
 
 The configuration parameters can be also set as a command line parameters, e.g. by running
 
@@ -66,5 +67,12 @@ or
 
 ### Visualization
 
+Visualization script **show_solution.py** in visualization folder can be used to show the last solution recorded in result log **sources/results/results.log**.
+To be able to run the script, following dependencies have to be installed first (for the Ubuntu 18.04 LTS):
+```bash
+sudo apt-get install python3-numpy python3-matplotlib python3-scipy python3-shapely python3-descartes python3-pip
+pip3 install git+git://github.com/AndrewWalker/pydubins.git
+```
+Then, the visualization script can be run by calling **./show_solution.py** showing the matplotlib graph of latest result and saving it to png image. Variant of POP is determined based on planning-state in ther results.
 
 
