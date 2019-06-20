@@ -138,10 +138,6 @@ crl::CConfig & addCommonConfig(crl::CConfig & config) {
 	config.add<bool>("initial-greedy-solution",
 			"whether to generate greedy initial solution instead of none or start-goal solution", true);
 
-	//opn
-	config.add<double>("neighborhood-radius", "radius of neighborhood in OPN , DOPN ...", 0.0);
-	config.add<int>("neighborhood-resolution", "radius of neighborhood in OPN , DOPN ...", 1);
-
 	config.add<std::string>("map-type", "map-type is MAP_POINTS_CITY_POINTS blender or MAP_FILE");
 
 	config.add<bool>("draw-targets-reward", "enable/disable drawing targets in different color using penalty", false);
