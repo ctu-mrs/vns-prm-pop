@@ -176,10 +176,12 @@ def getStandardDeviationInData(data_to_process,key):
     return sqrt(sum_squared_difference / (num_tested-1))
 
 def load_csv_numbers(file):
+    print("load_csv_numbers",file)
     samples = []
-    with open(file, 'rb') as csvfile:
+    with open(file, 'r') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',')
         for row in csvreader:
+            print(row)
             col = []
             for c in row:
                 col.append(float(c))

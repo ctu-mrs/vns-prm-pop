@@ -45,23 +45,24 @@ The most important configuration parameters are:
 - _map-type_ - switch between "MAP_POINTS_CITY_POINTS" for potholes and dense scenario, and "MAP_FILE" for building scenario
 - _collision-distance-check_ - distance in which check distance, aproximately minimal width among obstacles
 - _maximal-calculation-time-sec_ - the maximal calculation time in seconds, default is 600 as set in vns_prm_pop.cfg file
+- _budget-override_ - budget constraint of the orienteering problem
 
 The configuration parameters can be also set as a command line parameters, e.g. by running
 
 ```bash
-./vns_prm_pop --problem=../datasets/potholes/potholes-cell.txt --map-type=MAP_POINTS_CITY_POINTS --planning-state=2d --collision-distance-check=2.0 --gui=cairo --nowait=0
+./vns_prm_pop --problem=../datasets/potholes/potholes-cell.txt --map-type=MAP_POINTS_CITY_POINTS --planning-state=2d --collision-distance-check=2.0 --budget-override=6500 --gui=cairo --nowait=0 
 ```
 
 or
 
 ```bash
-./vns_prm_pop --problem=../datasets/dense/dense-cell.txt --map-type=MAP_POINTS_CITY_POINTS --planning-state=2d --collision-distance-check=2.0 --gui=cairo --nowait=0
+./vns_prm_pop --problem=../datasets/dense/dense-cell.txt --map-type=MAP_POINTS_CITY_POINTS --planning-state=2d --collision-distance-check=2.0 --budget-override=6500 --gui=cairo --nowait=0
 ```
 
 or
 
 ```bash
-./vns_prm_pop --problem=../datasets/building/building.txt --map-type=MAP_FILE --planning-state=3d --collision-distance-check=0.3 --gui=cairo --nowait=0
+./vns_prm_pop --problem=../datasets/building/building.txt --map-type=MAP_FILE --planning-state=3d --collision-distance-check=0.3 --budget-override=140 --gui=cairo --nowait=0
 ``` 
 
 
