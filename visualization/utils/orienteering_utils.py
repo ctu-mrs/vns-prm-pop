@@ -344,18 +344,19 @@ def load_obj_mesh_problem(filename,target_rewards):
             city_points.append([x,y,z,traget_reward])
             print(target_name,"x",x,"y",y,"z",z)
     
-        if "start-" in mesh.name:
+        if "start" in mesh.name:
             x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
             traget_reward = 0
             city_points.append([x,y,z,traget_reward])
             print("start x",x,"y",y,"z",z)
         
-        if "goal-" in mesh.name:
+        if "goal" in mesh.name:
             x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
             traget_reward = 0
             city_points.append([x,y,z,traget_reward])
             print("goal x",x,"y",y,"z",z)
     
+    print("city_points len",len(city_points))
     return city_points , obstacles
     
     
