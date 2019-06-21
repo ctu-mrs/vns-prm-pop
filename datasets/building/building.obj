@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: '3dproblem.blend'
 # www.blender.org
-mtllib 3dproblem.mtl
+mtllib building.mtl
 o target.003
 v 6.000000 12.200000 1.500000
 v 6.039018 12.196157 1.500000

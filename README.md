@@ -69,10 +69,13 @@ or
 
 Visualization script **show_solution.py** in visualization folder can be used to show the last solution recorded in result log **sources/results/results.log**.
 To be able to run the script, following dependencies have to be installed first (for the Ubuntu 18.04 LTS):
+
 ```bash
 sudo apt-get install python3-numpy python3-matplotlib python3-scipy python3-shapely python3-descartes python3-pip
 pip3 install git+git://github.com/AndrewWalker/pydubins.git
+pip3 install pywavefront
 ```
+
 Then, the visualization script can be run by calling **./show_solution.py** showing the matplotlib graph of latest result and saving it to png image. Variant of POP is determined based on planning-state in ther results.
 
 

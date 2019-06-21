@@ -4,6 +4,8 @@ import sys
 import csv
 import os
 from math import sqrt
+import collada
+import pywavefront
 #from sets import Set
 
 class OrienteeringProblemDefinition():
@@ -184,6 +186,12 @@ def load_csv_numbers(file):
             samples.append(col)
     return samples
 
+class PlanningState():
+    UNKNOWN = 0
+    D2 = 1
+    D3 = 2
+    DUBINSD2 = 3  
+
 class ObstacleProblem():
     LOADING_MAP_POINTS = 1
     LOADING_OBSTACLE = 2
@@ -251,4 +259,198 @@ class ObstacleProblem():
                 
                 if loading == ObstacleProblem.LOADING_BORDER:
                     self.border_indices.append(int(line))
+
+
+
+def load_3d_problem_definition(file):
+    loading_rewards=False
+    object_rewards = {}
+    map_file = None
+    with open(file, 'r') as f:
+        for line in f:
+            if '[TARGET_REWARDS]' in line:
+                loading_rewards = True
+                continue
+            if 'MAP_FILE' in line:
+                map_file_param = line.split("=")
+                map_file = map_file_param[1].strip()
+                print("map_file",map_file)
+                problem_dir_path = os.path.dirname(file)
+                map_file = os.path.join(problem_dir_path,map_file)
+                print("map_file",map_file)
+            if loading_rewards and not line.strip():
+                loading_rewards = False
+                continue
+            if loading_rewards:
+                parts = line.split()
+                #print(parts)
+                object_rewards[parts[0]] = float(parts[1])
     
+    city_points = None
+    obstacles = None
+    if map_file is not None:
+        city_points , obstacles  = load_obj_mesh_problem(map_file,object_rewards)
+    else:
+        print("can not load problem description",file,"no MAP_FILE")
+        
+    return city_points, obstacles
+
+def get_avg_target_pos(xses,yses,zses,triangles):
+    x=0
+    y=0
+    z=0
+    num_vertices = 0
+    for tri in triangles:
+        for vert in tri:
+            x += xses[vert]
+            y += yses[vert]
+            z += zses[vert]
+            num_vertices += 1
+    return x/float(num_vertices) , y/float(num_vertices) , z/float(num_vertices)
+
+def load_obj_mesh_problem(filename,target_rewards):
+    city_points = []
+    obstacles = []
+    
+    print("loading colada file",filename)
+    scene = pywavefront.Wavefront(filename,collect_faces=True)
+    xses=[]
+    yses=[]
+    zses = []
+    
+    
+    for vertex in scene.vertices:
+        xses.append(vertex[0])
+        yses.append(vertex[1])
+        zses.append(vertex[2])
+        
+    
+    for mesh in scene.mesh_list:
+        triangles = []
+        print("mesh ",mesh.name)
+        
+        for face in mesh.faces:
+            #print("face",face)
+            triangles.append(face)
+    
+        if "wall_" in mesh.name or "floor_" in mesh.name:
+             obstacles.append([xses,yses,zses,triangles])
+        
+        if "target" in mesh.name:
+            target_name = mesh.name.replace("target_","target.").replace("-mesh","")
+            traget_reward = target_rewards[target_name]
+            #print(target_rewards)
+            x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
+            city_points.append([x,y,z,traget_reward])
+            print(target_name,"x",x,"y",y,"z",z)
+    
+        if "start-" in mesh.name:
+            x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
+            traget_reward = 0
+            city_points.append([x,y,z,traget_reward])
+            print("start x",x,"y",y,"z",z)
+        
+        if "goal-" in mesh.name:
+            x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
+            traget_reward = 0
+            city_points.append([x,y,z,traget_reward])
+            print("goal x",x,"y",y,"z",z)
+    
+    return city_points , obstacles
+    
+    
+def load_dae_mesh_problem(filename,target_rewards):
+    city_points = []
+    obstacles = []
+    
+    print("loading colada file",filename)
+    mesh = collada.Collada(filename)
+    boundgeoms = list(mesh.scene.objects('geometry'))
+    
+    #print(boundgeoms)
+    for geomid in range(len(boundgeoms)):
+        
+        geom = boundgeoms[geomid]
+        #print("geomid",geomid)
+        #print("geom",geom.original)
+        #print("geom.id",geom.original.id)
+        transform = mesh.scene.nodes[geomid].transforms
+        #print(geom)
+        
+        #print("transform",transform)
+        xses = []
+        yses = []
+        zses = []
+        triandgles = []
+        
+        for triset in geom.primitives():
+            trilist = list(triset)
+            
+            for vertex in triset.vertex:
+                xses.append(vertex[0])
+                yses.append(vertex[1])
+                zses.append(vertex[2])
+                #print("v",vertex)
+            for triangle in trilist:
+                triangles.append(triangle.indices)
+    
+        #print(len(xses))
+        #print(triandgles)
+        if "wall_" in geom.original.id or "floor_" in geom.original.id:
+            #color = [0.5,0.5,0.5,0.1]
+            #edgecolor = [0.5,0.5,0.5,0.1]
+            #obst_plot = ax.plot_trisurf(xses , yses, zses,triangles=triandgles, linewidth=0.2, antialiased=True,color=color,edgecolor=edgecolor,zorder=3,label='obstacles')
+            obstacles.append([xses,yses,zses,triangles])
+            """
+            if not ploted_first_obstacle :
+                ploted_first_obstacle = True
+                fake2Dline = mpl.lines.Line2D([0],[0], linestyle="-",c=edgecolor, markerfacecolor=color, marker = 'o')
+                legend_plots.append(fake2Dline)
+                legend_text.append("\\textbf{obstacles}")
+            """
+            
+        if "start-" in geom.original.id:
+            x = mesh.scene.nodes[geomid].transforms[0].matrix[0,3]
+            y = mesh.scene.nodes[geomid].transforms[0].matrix[1,3]
+            z = mesh.scene.nodes[geomid].transforms[0].matrix[2,3]
+            traget_reward = 0
+            city_points.append([x,y,z,traget_reward])
+            print("start x",x,"y",y,"z",z)
+            #color = mycmap(cNorm(0))#
+            #edgecolor = mycmap(cNorm(0))#
+            #obst_plot = ax.plot_trisurf(xses , yses, zses,triangles=triandgles, linewidth=0.2, antialiased=True,color=color,edgecolor=edgecolor,zorder=3,label='obstacles')
+            
+            #plot([x],[y],[z],'ok',zorder=1000,label = 'start')
+        
+        if "goal-" in geom.original.id:
+            x = mesh.scene.nodes[geomid].transforms[0].matrix[0,3]
+            y = mesh.scene.nodes[geomid].transforms[0].matrix[1,3]
+            z = mesh.scene.nodes[geomid].transforms[0].matrix[2,3]
+            traget_reward = 0
+            city_points.append([x,y,z,traget_reward])
+            print("goal x",x,"y",y,"z",z)
+            #color = mycmap(cNorm(0))#
+            #edgecolor = mycmap(cNorm(0))#
+            #obst_plot = ax.plot_trisurf(xses , yses, zses,triangles=triandgles, linewidth=0.2, antialiased=True,color=color,edgecolor=edgecolor,zorder=3,label='obstacles')
+            
+            #plot([x],[y],[z],'ok',zorder=1000,label = 'goal')
+            
+        if "target" in geom.original.id:
+            #print(geom.original.id)
+            target_name = geom.original.id.replace("target_","target.").replace("-mesh","")
+            traget_reward = target_rewards[target_name]
+            #print(target_rewards)
+            x = mesh.scene.nodes[geomid].transforms[0].matrix[0,3]
+            y = mesh.scene.nodes[geomid].transforms[0].matrix[1,3]
+            z = mesh.scene.nodes[geomid].transforms[0].matrix[2,3]
+            print(target_name,"x",x,"y",y,"z",z)
+            city_points.append([x,y,z,traget_reward])
+            #color = mycmap(cNorm(traget_reward))#
+            #edgecolor = mycmap(cNorm(traget_reward))#
+            #obst_plot = ax.plot_trisurf(xses , yses, zses,triangles=triandgles, linewidth=0.2, antialiased=True,color=color,edgecolor=edgecolor,zorder=3,label='obstacles')
+            
+            #z = 1.2
+            #plot([x],[y],[z],'ok',zorder=1000,label = 'goal')
+    
+    return city_points , obstacles        
+            
