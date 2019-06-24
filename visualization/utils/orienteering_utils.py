@@ -181,7 +181,7 @@ def load_csv_numbers(file):
     with open(file, 'r') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',')
         for row in csvreader:
-            print(row)
+            #print(row)
             col = []
             for c in row:
                 col.append(float(c))
@@ -344,19 +344,19 @@ def load_obj_mesh_problem(filename,target_rewards):
             #print(target_rewards)
             x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
             city_points.append([x,y,z,traget_reward])
-            print(target_name,"x",x,"y",y,"z",z)
+            print(target_name,"x",x,"y",y,"z",z,"reward",traget_reward)
     
         if "start" in mesh.name:
             x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
             traget_reward = 0
             city_points.append([x,y,z,traget_reward])
-            print("start x",x,"y",y,"z",z)
+            print("start x",x,"y",y,"z",z,"reward",traget_reward)
         
         if "goal" in mesh.name:
             x,y,z =  get_avg_target_pos(xses , yses , zses , triangles)
             traget_reward = 0
             city_points.append([x,y,z,traget_reward])
-            print("goal x",x,"y",y,"z",z)
+            print("goal x",x,"y",y,"z",z,"reward",traget_reward)
     
     print("city_points len",len(city_points))
     return city_points , obstacles

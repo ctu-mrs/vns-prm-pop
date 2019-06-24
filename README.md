@@ -39,8 +39,8 @@ After compilation, the VNS-PRM can be run using **vns\_prm\_pop** program.
 The default configuration of programs is stored in **vns_prm_pop.cfg** file. 
 The most important configuration parameters are:
 - _problem_ - specifies location of sop dataset instance file
-- _gui_ - switch between "cairo" gui, "none" gui and "cairo-nowin" with background creation of gui images (gui is only shown for pure SOP and OPN instances, the DOP instances have no gui in runtime, however, can be visualized using the show_solution.py script)
-- _nowait_ - switch whether to close gui window after finish of the solver
+- _gui_ - switch between "cairo" gui, "none" gui and "cairo-nowin" with background creation of gui images (note that using gui significantly influences performance due to drawing of all prm samples, you can use show_solution.py in visualization to show results). In 3d instances, the gui shows 2d projection of the problem.
+- _nowait_ - switch whether to close gui window after finish of the solver "true" , or not "false"
 - _planning-state_ - switch between "2d", "dubins2d" or "3d" planning states
 - _map-type_ - switch between "MAP_POINTS_CITY_POINTS" for potholes and dense scenario, and "MAP_FILE" for building scenario
 - _collision-distance-check_ - distance in which check distance, aproximately minimal width among obstacles
