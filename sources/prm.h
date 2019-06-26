@@ -396,7 +396,7 @@ void PRM<T>::calculate_added_points(bool add_points) {
 			flann_index->knnSearch(new_points_matrix, indices, dists, k_search, flann::SearchParams(128));
 		} else if (planning_state == state2dheading) {
 			flann_index_dub->knnSearch(new_points_matrix, indices, dists, k_search, flann::SearchParams(128));
-			INFO("after knnSearch flann_index.size() " <<flann_index_dub->size());
+			//INFO("after knnSearch flann_index.size() " <<flann_index_dub->size());
 		}
 
 		indices_rew = indices;
