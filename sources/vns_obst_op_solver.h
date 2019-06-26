@@ -633,12 +633,12 @@ void VnsPrmOPSolver<T>::iterate(int iter) {
 	int initialNDepth = 1;
 	int maximalNDepth = 2;
 	while (!stop) {
-		INFO("act_iter "<<act_iter);
+		//INFO("act_iter "<<act_iter);
 		act_iter++;
 		//double lengthBeforePRMOptimization = tourVNSGOPPath.getPathLength();
 
 		//INFO("itteration "<<numIttertation);
-		if (act_iter % 2 == 0) {
+		if (act_iter % 5 == 0) {
 			INFO(
 					"itteration " << act_iter << " (last improved "<<numItersLastImprovement<<" with best reward " << tourVNSGOPPath.getReward() << ", length " << tourVNSGOPPath.getPathLength() << " and budget " << budget << " at time " << testTouring.getRTimeMS() << " ms");
 			//INFO("numItersLastImprovement "<<numItersLastImprovement)
@@ -837,8 +837,8 @@ void VnsPrmOPSolver<T>::optimize_all_node_pairs() {
 				add_samples_sum += relativeRewards[from_node][to_node] / relativeDensity[from_node][to_node];
 			}
 		}
-		INFO("average density:"<<sum_density/num_pairs)
-		INFO("average rewards:"<<sum_optimize_reward/num_pairs)
+		//INFO("average density:"<<sum_density/num_pairs)
+		//INFO("average rewards:"<<sum_optimize_reward/num_pairs)
 		//INFO(add_samples_sum);
 
 		if (num_unreachable_nodes > 0) {
@@ -873,7 +873,7 @@ void VnsPrmOPSolver<T>::optimize_all_node_pairs() {
 				}
 			}
 		}
-		INFO_RED("sum_added_samples "<<sum_added_samples);
+		//INFO_RED("sum_added_samples "<<sum_added_samples);
 		//INFO("calculate_added_points");
 		if (sum_added_samples > 0) {
 
@@ -1925,7 +1925,7 @@ void VnsPrmOPSolver<T>::drawPath(int usleepTime, VnsSopPath<T> * toShow) {
 
 		if (returnedPath.size() >= 2) {
 			std::vector<HeapNode<T>> plan_all;
-			INFO("drawPath")
+			//INFO("drawPath")
 			for (int var = 1; var < returnedPath.size(); ++var) {
 				int node_id_from =
 						nodesAllClusters[returnedPath[var - 1].clusterIndex][returnedPath[var - 1].nodeIndex].id;

@@ -328,8 +328,7 @@ void PRM<T>::calculate_added_points(bool add_points) {
 		//INFO("calculate_added_points begin");
 		//INFO("actually we have "<<generatedFreePositions.size()<<" points")
 		//INFO("flann_index.size() " <<flann_index->size()<<" generatedFreePositions.size() "<<generatedFreePositions.size());
-		INFO(
-				"we added "<<(generatedFreePositions.size()-continuous_point_adding_start_id) <<" points to existing " << continuous_point_adding_start_id<<" points")
+		//INFO(	"we added "<<(generatedFreePositions.size()-continuous_point_adding_start_id) <<" points to existing " << continuous_point_adding_start_id<<" points")
 		CShape color_new_points("red", "red", 1, 1);
 		//INFO("new_points bef");
 		std::vector<HeapNode<T> *> new_points(generatedFreePositions.begin() + continuous_point_adding_start_id,
@@ -386,7 +385,7 @@ void PRM<T>::calculate_added_points(bool add_points) {
 		if (planning_state == state2dheading) {
 			k_search = k * 10;
 		}
-		INFO_VAR(k);
+		//INFO_VAR(k);
 		//INFO_VAR(k_search);
 		std::vector<std::vector<int>> indices;
 		std::vector<std::vector<int>> indices_rew;
