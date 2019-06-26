@@ -3,4 +3,4 @@
 	url = https://github.com/comrob/crl
 [submodule "sources/lib/flann"]
 	path = sources/lib/flann
-	url = git@github.com:ctu-mrs/flann.git
+	url = https://github.com/ctu-mrs/flann.git 
