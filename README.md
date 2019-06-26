@@ -14,7 +14,7 @@ This repository will contain solver for the Physical Orienteering Problem (POP) 
 
 For Ubuntu 18.04 LTS the dependencies can be installed using apt as:
 ```bash 
-sudo apt-get install make ccache build-essential pkg-config liblog4cxx-dev libcairo2-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libboost-iostreams-dev libboost-system-dev
+sudo apt-get install make ccache build-essential pkg-config liblog4cxx-dev libcairo2-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libboost-iostreams-dev libboost-system-dev cmake libglu1-mesa-dev dvipng texlive-fonts-recommended texlive-fonts-extra
 ```
 
 ### Cloning and compilation of supporting libraries
@@ -46,6 +46,8 @@ The most important configuration parameters are:
 - _collision-distance-check_ - distance in which check distance, aproximately minimal width among obstacles
 - _maximal-calculation-time-sec_ - the maximal calculation time in seconds, default is 600 as set in vns_prm_pop.cfg file
 - _budget-override_ - budget constraint of the orienteering problem
+- _dubins-radius_ - turning radius of dubins vehicle
+- _dubins-resolution_ - number of heading samples in target locations
 
 The configuration parameters can be also set as a command line parameters, e.g. by running
 
@@ -74,7 +76,7 @@ To be able to run the script, following dependencies have to be installed first 
 ```bash
 sudo apt-get install python3-numpy python3-matplotlib python3-scipy python3-shapely python3-descartes python3-pip
 pip3 install git+git://github.com/AndrewWalker/pydubins.git
-pip3 install pywavefront
+pip3 install pywavefront pycollada
 ```
 
 Then, the visualization script can be run by calling **./show_solution.py** showing the matplotlib graph of latest result and saving it to png image. Variant of POP is determined based on planning-state in ther results.

@@ -81,8 +81,9 @@ elif "3d" == record["PLANNING_STATE_TYPE"]:
 elif "dubins2d" == record["PLANNING_STATE_TYPE"]:
     print("using dubins2d planning type")
     planning_state = PlanningState.DUBINSD2
+    op = orienteering_utils.ObstacleProblem()
     op.load_obstacle_problem_definition(problem_file)
-    city_points = op.nodes
+    city_points = op.city_points
     map_points = op.map_points
     obstacles = op.obstacles
     border = op.border_indices
@@ -92,9 +93,10 @@ else:
     planning_state = PlanningState.UNKNOWN
     quit(1)
 
-result_target_ids = record['RESULT_TARGET_IDS']
+result_target_ids = record['RESULT_CLUSTER_IDS']
 result_rewards = record['REWARDS']
 result_length = record['LENGTH']
+turning_radius = record['DUBINS_RADIUS']
 print("problem loaded")
 print("result_target_ids:", result_target_ids)
 print("result_rewards", result_rewards)
@@ -104,7 +106,6 @@ print("result_length", result_length)
 calc_reward = 0
 for target_idx in range(len(result_target_ids)):
     node = result_target_ids[target_idx]
-    #print("node",node,"len city nodes",len(city_points))
     if planning_state == PlanningState.D3:
         calc_reward += city_points[node][3]
     else:
@@ -114,16 +115,7 @@ for target_idx in range(len(result_target_ids)):
 
 print("calc_reward", calc_reward)
 
-calc_length = 0
-for i in range(1,len(prm_path)):
-    prew = prm_path[i-1]
-    act = prm_path[i]
-    if planning_state == PlanningState.D3:
-        calc_length += math.sqrt((act[0]-prew[0])**2+(act[1]-prew[1])**2+(act[2]-prew[2])**2)
-    else:
-        calc_length += math.sqrt((act[0]-prew[0])**2+(act[1]-prew[1])**2)
-        
-print("calc_length",calc_length)
+
 
 mycmap = plt.cm.get_cmap('RdYlBu_r')
 
@@ -153,10 +145,8 @@ for nidx in range(len(city_points)):
     nodes_w_rewards[nidx, 1] = city_points[nidx][1]
     nodes_w_rewards[nidx, 2] = city_points[nidx][2]
     if planning_state == PlanningState.D3:
-        print("D3")
         nodes_w_rewards[nidx, 3] = city_points[nidx][3]
     
-print("nodes_w_rewards",nodes_w_rewards)
 if planning_state == PlanningState.D3:
     minrew = min(nodes_w_rewards[:, 3])
     maxrew = max(nodes_w_rewards[:, 3])
@@ -200,7 +190,6 @@ else:
 
 #circles = figure_utils.circles(nodes_w_rewards[:, 0], nodes_w_rewards[:, 1], circle_radiuses1, c=nodes_w_rewards[:, 2] , alpha=0.05, edgecolor='black', linewidth=0.9, linestyle=':')
 if planning_state == PlanningState.D3:
-    print("rewards",nodes_w_rewards[:, 3])
     sc = ax.scatter(nodes_w_rewards[:, 0], nodes_w_rewards[:, 1],nodes_w_rewards[:, 2], c=nodes_w_rewards[:, 3], cmap=mycmap , alpha=1.0, s=55, linewidths= 1.2, facecolor='black',edgecolor='black')
     #plt.plot(nodes_w_rewards[:, 0], nodes_w_rewards[:, 1], nodes_w_rewards[:, 2], 'ok', ms=4.0)
     prm_samples = orienteering_utils.load_csv_numbers(SAMPLES_FILE)
@@ -208,30 +197,36 @@ else:
     sc = plt.scatter(nodes_w_rewards[:, 0], nodes_w_rewards[:, 1], c=nodes_w_rewards[:, 2], cmap=mycmap , alpha=1.0, s=55,linewidths= 1.2, facecolor='black',edgecolor='black',zorder=10)
     #plt.plot(nodes_w_rewards[:, 0], nodes_w_rewards[:, 1], 'ok', ms=4.0)
 
-"""
-for node_idx in range(1, len(result_target_ids)):
 
-    node = result_target_ids[node_idx]
-    node_prew = result_target_ids[node_idx - 1]
-    node_pos = [city_points[node][0], city_points[node][1], city_points[node][2]]
-    node_pos_prew = [city_points[node_prew][0], city_points[node_prew][1], city_points[node_prew][2]]
-    print(node_prew, '->', node, ",", node_pos_prew, '->', node_pos)
-    if planning_state == PlanningState.D3:
-        plt.plot([node_pos_prew[0], node_pos[0] ], [node_pos_prew[1], node_pos[1] ], [node_pos_prew[2], node_pos[2] ], '-g', lw=1.6)
-    else:
-        plt.plot([node_pos_prew[0], node_pos[0] ], [node_pos_prew[1], node_pos[1] ], '-g', lw=1.6)
-"""
+calc_length = 0
 
 for i in range(1,len(prm_path)):
-#for i in range(1,len(prm_path)):
+    
     prew = prm_path[i-1]
     act = prm_path[i]
+    #print(prew,"->",act)
     if planning_state == PlanningState.D3:
+        calc_length += math.sqrt((act[0]-prew[0])**2+(act[1]-prew[1])**2+(act[2]-prew[2])**2)
         plt.plot([prew[0], act[0] ], [prew[1], act[1] ], [prew[2], act[2] ], '-g', lw=2.3)
-    else:
+    elif planning_state == PlanningState.D2:
+        calc_length += math.sqrt((act[0]-prew[0])**2+(act[1]-prew[1])**2)
         plt.plot([prew[0], act[0] ], [prew[1], act[1] ], '-g', lw=2.3)
-        
-      
+    else:
+        DUBINS_STEP_SIZE = 20
+        qs = []
+        maneuver = dubins.shortest_path(prew, act, turning_radius)
+        path_len = maneuver.path_length()
+        calc_length += path_len
+        for act_len in orienteering_utils.frange(0,path_len,DUBINS_STEP_SIZE):
+            #print(act_len)
+            pos_act = maneuver.sample(act_len)
+            qs.append(pos_act)
+            #print("len",maneuver.path_length())
+        pos_act = maneuver.sample(path_len)
+        qs.append(pos_act) 
+        plt.plot([item[0] for item in qs],[item[1] for item in qs], '-g', lw=2.3)
+    
+print("calc_length",calc_length)
 
 
 figure_utils.no_axis(ax)
